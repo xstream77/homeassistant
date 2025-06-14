@@ -18,11 +18,10 @@ blueprint:
             - queued
             - parallel
     remote:
-      name: Action sensor
-      description: The sensor entity from Zigbee2MQTT (e.g. sensor.scene_switcher_action)
+      name: Switch entity
+      description: The entity from Zigbee2MQTT 
       selector:
-        entity:
-          domain: sensor
+        entity: {}
     button_1_short_press:
       name: Single Press - Button 1
       default: []
