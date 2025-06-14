@@ -1,229 +1,124 @@
 blueprint:
-  name: TS0044 Zigbee Remote
-  description: Configure actions for TS0044
+  name: Zigbee2MQTT - Tuya 1 to 4 Buttons (Z2M Legacy Action Support)
+  description: >
+    Zigbee2MQTT Tuya 1–4 button remotes with legacy_action_sensor: true enabled.
+    Works with remotes publishing an "action" attribute like "1_single", "2_hold", etc.
   domain: automation
-  source_url: https://github.com/xstream77/homeassistant/blob/main/ts0044_zigbee_remote.yaml
-  author: Zachary Priddy
   input:
-    ts0044_device:
-      name: TS0044 Remote
+    mode:
+      name: Automation Mode
+      description: https://www.home-assistant.io/docs/automation/modes/
+      default: parallel
       selector:
-        device:
-          filter:
-            model: TS0044
-
-    # Actions
-    button_1_press:
-      name: Actions for Button 1 Pressed
-      default:
+        select:
+          mode: dropdown
+          options:
+            - single
+            - restart
+            - queued
+            - parallel
+    remote:
+      name: Action sensor
+      description: The sensor entity from Zigbee2MQTT (e.g. sensor.scene_switcher_action)
       selector:
-
+        entity:
+          domain: sensor
+    button_1_short_press:
+      name: Single Press - Button 1
+      default: []
+      selector:
+        action: {}
     button_1_double_press:
-      name: Actions for Button 1 Double Pressed
-      default:
+      name: Double Press - Button 1
+      default: []
       selector:
-
-    button_1_held:
-      name: Actions for Button 1 Held
-      default:
+        action: {}
+    button_1_hold:
+      name: Hold - Button 1
+      default: []
       selector:
-
-    button_2_press:
-      name: Actions for Button 2 Pressed
-      default:
+        action: {}
+    button_2_short_press:
+      name: Single Press - Button 2
+      default: []
       selector:
-
+        action: {}
     button_2_double_press:
-      name: Actions for Button 2 Double Pressed
-      default:
+      name: Double Press - Button 2
+      default: []
       selector:
-
-    button_2_held:
-      name: Actions for Button 2 Held
-      default:
+        action: {}
+    button_2_hold:
+      name: Hold - Button 2
+      default: []
       selector:
-
-    button_3_press:
-      name: Actions for Button 3 Pressed
-      default:
+        action: {}
+    button_3_short_press:
+      name: Single Press - Button 3
+      default: []
       selector:
-
+        action: {}
     button_3_double_press:
-      name: Actions for Button 3 Double Pressed
-      default:
+      name: Double Press - Button 3
+      default: []
       selector:
-
-    button_3_held:
-      name: Actions for Button 3 Held
-      default:
+        action: {}
+    button_3_hold:
+      name: Hold - Button 3
+      default: []
       selector:
-
-    button_4_press:
-      name: Actions for Button 4 Pressed
-      default:
+        action: {}
+    button_4_short_press:
+      name: Single Press - Button 4
+      default: []
       selector:
-
+        action: {}
     button_4_double_press:
-      name: Actions for Button 4 Double Pressed
-      default:
+      name: Double Press - Button 4
+      default: []
       selector:
-
-    button_4_held:
-      name: Actions for Button 4 Held
-      default:
+        action: {}
+    button_4_hold:
+      name: Hold - Button 4
+      default: []
       selector:
+        action: {}
 
-mode: parallel
-max: 10
+mode: !input mode
+max_exceeded: silent
 
 trigger:
+  - platform: state
+    entity_id: !input remote
+    attribute: action
 
-  # Button 1
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: button_1
-    id: b1-1
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: button_1
-    id: b1-2
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: button_1
-    id: b1-h
-    
-    # Button 2
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: button_2
-    id: b2-1
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: button_2
-    id: b2-2
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: button_2
-    id: b2-h
-
-    # Button 3
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: button_3
-    id: b3-1
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: button_3
-    id: b3-2
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: button_3
-    id: b3-h
-
-    # Button 4
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_short_press
-    subtype: button_4
-    id: b4-1
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_double_press
-    subtype: button_4
-    id: b4-2
-  - device_id: !input ts0044_device
-    domain: zha
-    platform: device
-    type: remote_button_long_press
-    subtype: button_4
-    id: b4-h
+condition: []
 
 action:
+  - variables:
+      event_type: "{{ trigger.to_state.attributes.action | default('') }}"
   - choose:
-      # Button 1
-      - conditions:
-          - condition: trigger
-            id:
-              - b1-1
-        sequence: !input button_1_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b1-2
+      - conditions: "{{ event_type == '1_single' }}"
+        sequence: !input button_1_short_press
+      - conditions: "{{ event_type == '1_double' }}"
         sequence: !input button_1_double_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b1-h
-        sequence: !input button_1_held
-      
-      # Button 2
-      - conditions:
-          - condition: trigger
-            id:
-              - b2-1
-        sequence: !input button_2_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b2-2
+      - conditions: "{{ event_type == '1_hold' }}"
+        sequence: !input button_1_hold
+      - conditions: "{{ event_type == '2_single' }}"
+        sequence: !input button_2_short_press
+      - conditions: "{{ event_type == '2_double' }}"
         sequence: !input button_2_double_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b2-h
-        sequence: !input button_2_held
-
-      # Button 3
-      - conditions:
-          - condition: trigger
-            id:
-              - b3-1
-        sequence: !input button_3_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b3-2
+      - conditions: "{{ event_type == '2_hold' }}"
+        sequence: !input button_2_hold
+      - conditions: "{{ event_type == '3_single' }}"
+        sequence: !input button_3_short_press
+      - conditions: "{{ event_type == '3_double' }}"
         sequence: !input button_3_double_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b3-h
-        sequence: !input button_3_held
-
-      # Button 4
-      - conditions:
-          - condition: trigger
-            id:
-              - b4-1
-        sequence: !input button_4_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b4-2
+      - conditions: "{{ event_type == '3_hold' }}"
+        sequence: !input button_3_hold
+      - conditions: "{{ event_type == '4_single' }}"
+        sequence: !input button_4_short_press
+      - conditions: "{{ event_type == '4_double' }}"
         sequence: !input button_4_double_press
-      - conditions:
-          - condition: trigger
-            id:
-              - b4-h
-        sequence: !input button_4_held
+      - conditions: "{{ event_type == '4_hold' }}"
+        sequence: !input button_4_hold
