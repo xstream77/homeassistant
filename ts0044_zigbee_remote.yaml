@@ -1,31 +1,23 @@
 blueprint:
-  name: Zigbee2MQTT - TS0044 (MQTT-Event, keine legacy sensor)
+  name: Zigbee2MQTT - TS0044 (Device Trigger)
   description: >
-    Reagiere direkt auf MQTT-Events von Zigbee2MQTT, z. B. TS0044 (4-Tasten-Tuya-Schalter).
-    Benötigt KEIN legacy_action_sensor. Unterstützt 1–4 Tasten mit single, double, hold Aktionen.
+    Für Tuya TS0044 Schalter (4 Tasten) via Zigbee2MQTT mit Geräteintegration in Home Assistant.
+    Nutzt den eingebauten "device"-Trigger mit den Aktionen: 1–4 und single, double, hold.
+    KEIN legacy_action_sensor notwendig.
   domain: automation
   input:
-    mode:
-      name: Automation Mode
-      default: parallel
+    remote:
+      name: TS0044 Gerät
+      description: Das Zigbee-Gerät (muss in HA als Gerät erscheinen)
       selector:
-        select:
-          options:
-            - single
-            - restart
-            - queued
-            - parallel
-    device_topic:
-      name: Zigbee2MQTT Topic
-      description: Topic des Geräts (z. B. zigbee2mqtt/TS0044)
-      selector:
-        text:
-    button_1_short_press:
+        device:
+          integration: mqtt
+    button_1_single:
       name: Button 1 - Single Press
       default: []
       selector:
         action: {}
-    button_1_double_press:
+    button_1_double:
       name: Button 1 - Double Press
       default: []
       selector:
@@ -35,12 +27,12 @@ blueprint:
       default: []
       selector:
         action: {}
-    button_2_short_press:
+    button_2_single:
       name: Button 2 - Single Press
       default: []
       selector:
         action: {}
-    button_2_double_press:
+    button_2_double:
       name: Button 2 - Double Press
       default: []
       selector:
@@ -50,12 +42,12 @@ blueprint:
       default: []
       selector:
         action: {}
-    button_3_short_press:
+    button_3_single:
       name: Button 3 - Single Press
       default: []
       selector:
         action: {}
-    button_3_double_press:
+    button_3_double:
       name: Button 3 - Double Press
       default: []
       selector:
@@ -65,12 +57,12 @@ blueprint:
       default: []
       selector:
         action: {}
-    button_4_short_press:
+    button_4_single:
       name: Button 4 - Single Press
       default: []
       selector:
         action: {}
-    button_4_double_press:
+    button_4_double:
       name: Button 4 - Double Press
       default: []
       selector:
@@ -81,41 +73,136 @@ blueprint:
       selector:
         action: {}
 
-mode: !input mode
+mode: parallel
 max_exceeded: silent
 
 trigger:
-  - platform: event
-    event_type: mqtt
-    event_data:
-      topic: !input device_topic
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 1_single
+    id: b1_single
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 1_double
+    id: b1_double
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 1_hold
+    id: b1_hold
 
-variables:
-  action: "{{ trigger.event.data.payload_json.action | default('') }}"
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 2_single
+    id: b2_single
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 2_double
+    id: b2_double
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 2_hold
+    id: b2_hold
+
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 3_single
+    id: b3_single
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 3_double
+    id: b3_double
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 3_hold
+    id: b3_hold
+
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 4_single
+    id: b4_single
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 4_double
+    id: b4_double
+  - platform: device
+    device_id: !input remote
+    domain: mqtt
+    type: action
+    subtype: 4_hold
+    id: b4_hold
 
 action:
   - choose:
-      - conditions: "{{ action == '1_single' }}"
-        sequence: !input button_1_short_press
-      - conditions: "{{ action == '1_double' }}"
-        sequence: !input button_1_double_press
-      - conditions: "{{ action == '1_hold' }}"
+      - conditions:
+          - condition: trigger
+            id: b1_single
+        sequence: !input button_1_single
+      - conditions:
+          - condition: trigger
+            id: b1_double
+        sequence: !input button_1_double
+      - conditions:
+          - condition: trigger
+            id: b1_hold
         sequence: !input button_1_hold
-      - conditions: "{{ action == '2_single' }}"
-        sequence: !input button_2_short_press
-      - conditions: "{{ action == '2_double' }}"
-        sequence: !input button_2_double_press
-      - conditions: "{{ action == '2_hold' }}"
+
+      - conditions:
+          - condition: trigger
+            id: b2_single
+        sequence: !input button_2_single
+      - conditions:
+          - condition: trigger
+            id: b2_double
+        sequence: !input button_2_double
+      - conditions:
+          - condition: trigger
+            id: b2_hold
         sequence: !input button_2_hold
-      - conditions: "{{ action == '3_single' }}"
-        sequence: !input button_3_short_press
-      - conditions: "{{ action == '3_double' }}"
-        sequence: !input button_3_double_press
-      - conditions: "{{ action == '3_hold' }}"
+
+      - conditions:
+          - condition: trigger
+            id: b3_single
+        sequence: !input button_3_single
+      - conditions:
+          - condition: trigger
+            id: b3_double
+        sequence: !input button_3_double
+      - conditions:
+          - condition: trigger
+            id: b3_hold
         sequence: !input button_3_hold
-      - conditions: "{{ action == '4_single' }}"
-        sequence: !input button_4_short_press
-      - conditions: "{{ action == '4_double' }}"
-        sequence: !input button_4_double_press
-      - conditions: "{{ action == '4_hold' }}"
+
+      - conditions:
+          - condition: trigger
+            id: b4_single
+        sequence: !input button_4_single
+      - conditions:
+          - condition: trigger
+            id: b4_double
+        sequence: !input button_4_double
+      - conditions:
+          - condition: trigger
+            id: b4_hold
         sequence: !input button_4_hold
