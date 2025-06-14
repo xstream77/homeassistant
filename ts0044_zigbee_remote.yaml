@@ -1,84 +1,82 @@
 blueprint:
-  name: Zigbee2MQTT - Tuya 1 to 4 Buttons (Z2M Legacy Action Support)
+  name: Zigbee2MQTT - TS0044 (MQTT-Event, keine legacy sensor)
   description: >
-    Zigbee2MQTT Tuya 1–4 button remotes with legacy_action_sensor: true enabled.
-    Works with remotes publishing an "action" attribute like "1_single", "2_hold", etc.
+    Reagiere direkt auf MQTT-Events von Zigbee2MQTT, z. B. TS0044 (4-Tasten-Tuya-Schalter).
+    Benötigt KEIN legacy_action_sensor. Unterstützt 1–4 Tasten mit single, double, hold Aktionen.
   domain: automation
   input:
     mode:
       name: Automation Mode
-      description: https://www.home-assistant.io/docs/automation/modes/
       default: parallel
       selector:
         select:
-          mode: dropdown
           options:
             - single
             - restart
             - queued
             - parallel
-    remote:
-      name: Switch entity
-      description: The entity from Zigbee2MQTT 
+    device_topic:
+      name: Zigbee2MQTT Topic
+      description: Topic des Geräts (z. B. zigbee2mqtt/TS0044)
       selector:
-        entity: {}
+        text:
     button_1_short_press:
-      name: Single Press - Button 1
+      name: Button 1 - Single Press
       default: []
       selector:
         action: {}
     button_1_double_press:
-      name: Double Press - Button 1
+      name: Button 1 - Double Press
       default: []
       selector:
         action: {}
     button_1_hold:
-      name: Hold - Button 1
+      name: Button 1 - Hold
       default: []
       selector:
         action: {}
     button_2_short_press:
-      name: Single Press - Button 2
+      name: Button 2 - Single Press
       default: []
       selector:
         action: {}
     button_2_double_press:
-      name: Double Press - Button 2
+      name: Button 2 - Double Press
       default: []
       selector:
         action: {}
     button_2_hold:
-      name: Hold - Button 2
+      name: Button 2 - Hold
       default: []
       selector:
         action: {}
     button_3_short_press:
-      name: Single Press - Button 3
+      name: Button 3 - Single Press
       default: []
       selector:
         action: {}
     button_3_double_press:
-      name: Double Press - Button 3
+      name: Button 3 - Double Press
       default: []
       selector:
         action: {}
     button_3_hold:
-      name: Hold - Button 3
+      name: Button 3 - Hold
       default: []
       selector:
         action: {}
     button_4_short_press:
-      name: Single Press - Button 4
+      name: Button 4 - Single Press
       default: []
       selector:
         action: {}
     button_4_double_press:
-      name: Double Press - Button 4
+      name: Button 4 - Double Press
       default: []
       selector:
         action: {}
     button_4_hold:
-      name: Hold - Button 4
+      name: Button 4 - Hold
       default: []
       selector:
         action: {}
@@ -87,37 +85,37 @@ mode: !input mode
 max_exceeded: silent
 
 trigger:
-  - platform: state
-    entity_id: !input remote
-    attribute: action
+  - platform: event
+    event_type: mqtt
+    event_data:
+      topic: !input device_topic
 
-condition: []
+variables:
+  action: "{{ trigger.event.data.payload_json.action | default('') }}"
 
 action:
-  - variables:
-      event_type: "{{ trigger.to_state.attributes.action | default('') }}"
   - choose:
-      - conditions: "{{ event_type == '1_single' }}"
+      - conditions: "{{ action == '1_single' }}"
         sequence: !input button_1_short_press
-      - conditions: "{{ event_type == '1_double' }}"
+      - conditions: "{{ action == '1_double' }}"
         sequence: !input button_1_double_press
-      - conditions: "{{ event_type == '1_hold' }}"
+      - conditions: "{{ action == '1_hold' }}"
         sequence: !input button_1_hold
-      - conditions: "{{ event_type == '2_single' }}"
+      - conditions: "{{ action == '2_single' }}"
         sequence: !input button_2_short_press
-      - conditions: "{{ event_type == '2_double' }}"
+      - conditions: "{{ action == '2_double' }}"
         sequence: !input button_2_double_press
-      - conditions: "{{ event_type == '2_hold' }}"
+      - conditions: "{{ action == '2_hold' }}"
         sequence: !input button_2_hold
-      - conditions: "{{ event_type == '3_single' }}"
+      - conditions: "{{ action == '3_single' }}"
         sequence: !input button_3_short_press
-      - conditions: "{{ event_type == '3_double' }}"
+      - conditions: "{{ action == '3_double' }}"
         sequence: !input button_3_double_press
-      - conditions: "{{ event_type == '3_hold' }}"
+      - conditions: "{{ action == '3_hold' }}"
         sequence: !input button_3_hold
-      - conditions: "{{ event_type == '4_single' }}"
+      - conditions: "{{ action == '4_single' }}"
         sequence: !input button_4_short_press
-      - conditions: "{{ event_type == '4_double' }}"
+      - conditions: "{{ action == '4_double' }}"
         sequence: !input button_4_double_press
-      - conditions: "{{ event_type == '4_hold' }}"
+      - conditions: "{{ action == '4_hold' }}"
         sequence: !input button_4_hold
