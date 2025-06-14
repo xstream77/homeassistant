@@ -2,7 +2,7 @@ blueprint:
   name: TS0044 Zigbee Remote
   description: Configure actions for TS0044
   domain: automation
-  source_url: https://raw.githubusercontent.com/zpriddy/Home-Assistant/main/blueprints/ts0044_zigbee_remote.yaml
+  source_url: https://github.com/xstream77/homeassistant/blob/main/ts0044_zigbee_remote.yaml
   author: Zachary Priddy
   input:
     ts0044_device:
