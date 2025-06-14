@@ -17,73 +17,61 @@ blueprint:
       name: Actions for Button 1 Pressed
       default:
       selector:
-        action:
 
     button_1_double_press:
       name: Actions for Button 1 Double Pressed
       default:
       selector:
-        action:
 
     button_1_held:
       name: Actions for Button 1 Held
       default:
       selector:
-        action:
 
     button_2_press:
       name: Actions for Button 2 Pressed
       default:
       selector:
-        action:
 
     button_2_double_press:
       name: Actions for Button 2 Double Pressed
       default:
       selector:
-        action:
 
     button_2_held:
       name: Actions for Button 2 Held
       default:
       selector:
-        action:
 
     button_3_press:
       name: Actions for Button 3 Pressed
       default:
       selector:
-        action:
 
     button_3_double_press:
       name: Actions for Button 3 Double Pressed
       default:
       selector:
-        action:
 
     button_3_held:
       name: Actions for Button 3 Held
       default:
       selector:
-        action:
 
     button_4_press:
       name: Actions for Button 4 Pressed
       default:
       selector:
-        action:
 
     button_4_double_press:
       name: Actions for Button 4 Double Pressed
       default:
       selector:
-        action:
 
     button_4_held:
       name: Actions for Button 4 Held
       default:
       selector:
-        action:
 
 mode: parallel
 max: 10
